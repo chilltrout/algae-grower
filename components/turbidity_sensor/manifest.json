@@ -1,0 +1,7 @@
+{
+  "domain": "turbidity_sensor",
+  "name": "Turbidity Sensor",
+  "documentation": "https://link_to_documentation",
+  "requirements": [],
+  "codeowners": []
+}
