@@ -1,5 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
+from esphome.components import gpio
 from esphome.const import CONF_ID
 
 DEPENDENCIES = ['gpio']
@@ -13,9 +14,9 @@ CONF_S3_PIN = 's3_pin'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required(CONF_S1_PIN): cv.gpio_pin,
-    cv.Required(CONF_S2_PIN): cv.gpio_pin,
-    cv.Required(CONF_S3_PIN): cv.gpio_pin,
+    cv.Required(CONF_S1_PIN): cv.All(cv.int_, cv.Range(min=0)),
+    cv.Required(CONF_S2_PIN): cv.All(cv.int_, cv.Range(min=0)),
+    cv.Required(CONF_S3_PIN): cv.All(cv.int_, cv.Range(min=0)),
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
