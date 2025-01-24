@@ -11,14 +11,24 @@ void TurbiditySensor::setup() {
 }
 
 void TurbiditySensor::loop() {
-  // Loop code here
+  // Loop code here (if needed)
 }
 
 void TurbiditySensor::update() {
-  // Update sensor reading here
-  // Example:
-  // float value = read_sensor();
-  // publish_state(value);
+  if (expander_ == nullptr || uart_ == nullptr) {
+    ESP_LOGW(TAG, "Expander or UART not set");
+    return;
+  }
+
+  expander_->select_channel(channel_);
+  
+  // Read data from the sensor via UART
+  // This is a placeholder. Implement your actual sensor reading logic here.
+  char buffer[32];
+  if (uart_->read_line(buffer, sizeof(buffer))) {
+    float value = atof(buffer);
+    publish_state(value);
+  }
 }
 
 }  // namespace turbidity_sensor
