@@ -8,15 +8,16 @@
 namespace esphome {
 namespace turbidity_sensor {
 
-class TurbiditySensor : public sensor::Sensor, public Component {
+class TurbiditySensor : public sensor::Sensor, public PollingComponent {
  public:
+  TurbiditySensor() : PollingComponent(15000) {} // Poll every 15 seconds
+
   void set_uart(uart::UARTComponent *uart) { uart_ = uart; }
   void set_expander(atlas_serial_expander::AtlasSerialExpander *expander) { expander_ = expander; }
   void set_channel(uint8_t channel) { channel_ = channel; }
   
   void setup() override;
-  void loop() override;
-  void update() override;
+  void update() override;  // This now correctly overrides PollingComponent's update method
   
  protected:
   uart::UARTComponent *uart_{nullptr};
@@ -26,4 +27,3 @@ class TurbiditySensor : public sensor::Sensor, public Component {
 
 }  // namespace turbidity_sensor
 }  // namespace esphome
-
