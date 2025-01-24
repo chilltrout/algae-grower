@@ -1,27 +1,41 @@
 #pragma once
 
 #include "esphome/core/component.h"
-#include "esphome/core/log.h"
-#include "esphome/core/hal.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/uart/uart.h"
+#include "esphome/core/gpio.h"
 
 namespace esphome {
 namespace turbidity_sensor {
 
-class TurbiditySensor : public sensor::Sensor, public PollingComponent {
+class TurbidityPlatform : public Component {
  public:
-  TurbiditySensor(GPIOPin *s1_pin, GPIOPin *s2_pin, GPIOPin *s3_pin, UARTComponent *uart, int channel);
-  void setup() override;
-  void update() override;
-  void dump_config() override;
+  void set_s1_pin(GPIOPin *pin) { s1_pin_ = pin; }
+  void set_s2_pin(GPIOPin *pin) { s2_pin_ = pin; }
+  void set_s3_pin(GPIOPin *pin) { s3_pin_ = pin; }
 
- protected:
+  GPIOPin *get_s1_pin() const { return s1_pin_; }
+  GPIOPin *get_s2_pin() const { return s2_pin_; }
+  GPIOPin *get_s3_pin() const { return s3_pin_; }
+
+ private:
   GPIOPin *s1_pin_;
   GPIOPin *s2_pin_;
   GPIOPin *s3_pin_;
-  UARTComponent *uart_bus_;
-  int channel_;
+};
+
+class TurbiditySensor : public sensor::Sensor, public Component {
+ public:
+  void set_channel(uint8_t channel) { channel_ = channel; }
+  void set_uart_id(UARTComponent *uart) { uart_ = uart; }
+  void set_platform(TurbidityPlatform *platform) { platform_ = platform; }
+
+  void setup() override;
+  void update() override;
+
+ protected:
+  uint8_t channel_;
+  UARTComponent *uart_;
+  TurbidityPlatform *platform_;
 };
 
 }  // namespace turbidity_sensor
