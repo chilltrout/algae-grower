@@ -17,8 +17,6 @@ class AtlasSerialExpander : public Component {
   void setup() override;
   void loop() override;
 
-  void select_channel(uint8_t channel);
-
  protected:
   GPIOPin *s1_pin_;
   GPIOPin *s2_pin_;
