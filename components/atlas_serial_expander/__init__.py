@@ -1,7 +1,3 @@
-LLM served by Perplexity Labs
-I see the issue now. The error is occurring because the gpio_output_pin_schema is not defined in the esphome.components.gpio module. This is likely due to changes in the ESPHome API. Let's modify the atlas_serial_expander component to use the correct pin schema. Here's how we can fix this:
-Update the __init__.py file in your atlas_serial_expander component:
-python
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import gpio
@@ -14,9 +10,9 @@ AtlasSerialExpander = atlas_serial_expander_ns.class_('AtlasSerialExpander', cg.
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required('s1_pin'): cv.All(cv.Required, cv.pins_schema),
-    cv.Required('s2_pin'): cv.All(cv.Required, cv.pins_schema),
-    cv.Required('s3_pin'): cv.All(cv.Required, cv.pins_schema),
+    cv.Required('s1_pin'): cv.All(cv.Required, cv.pin_schema),
+    cv.Required('s2_pin'): cv.All(cv.Required, cv.pin_schema),
+    cv.Required('s3_pin'): cv.All(cv.Required, cv.pin_schema),
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
