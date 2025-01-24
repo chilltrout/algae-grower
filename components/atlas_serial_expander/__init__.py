@@ -1,9 +1,9 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import gpio
+from esphome import pins
 from esphome.const import CONF_ID
 
-DEPENDENCIES = ['gpio']
+DEPENDENCIES = ['esp32']  # or 'esp8266' depending on your platform
 
 atlas_serial_expander_ns = cg.esphome_ns.namespace('atlas_serial_expander')
 AtlasSerialExpander = atlas_serial_expander_ns.class_('AtlasSerialExpander', cg.Component)
@@ -14,9 +14,9 @@ CONF_S3_PIN = 's3_pin'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required(CONF_S1_PIN): cv.All(cv.int_, cv.Range(min=0)),
-    cv.Required(CONF_S2_PIN): cv.All(cv.int_, cv.Range(min=0)),
-    cv.Required(CONF_S3_PIN): cv.All(cv.int_, cv.Range(min=0)),
+    cv.Required(CONF_S1_PIN): pins.gpio_output_pin_schema,
+    cv.Required(CONF_S2_PIN): pins.gpio_output_pin_schema,
+    cv.Required(CONF_S3_PIN): pins.gpio_output_pin_schema,
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
