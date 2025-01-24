@@ -8,7 +8,7 @@ DEPENDENCIES = ['uart']
 AUTO_LOAD = ['sensor']
 
 CONFIG_SCHEMA = turbidity_sensor_sensor.CONFIG_SCHEMA
-DEPENDENCIES = turbidity_sensor_sensor.DEPENDENCIES
+DEPENDENCIES.extend(turbidity_sensor_sensor.DEPENDENCIES)
 
 async def to_code(config):
     await sensor.register_sensor(config)
