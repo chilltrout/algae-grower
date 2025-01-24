@@ -25,3 +25,4 @@ class TurbiditySensor : public sensor::Sensor, public Component {
 
 }  // namespace turbidity_sensor
 }  // namespace esphome
+
