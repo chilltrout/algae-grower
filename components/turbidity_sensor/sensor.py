@@ -11,9 +11,9 @@ CONFIG_SCHEMA = (
     .extend(
         {
             cv.Required(CONF_ID): cv.declare_id(TurbiditySensor),
-            cv.Required('s1_pin'): cv.pin,
-            cv.Required('s2_pin'): cv.pin,
-            cv.Required('s3_pin'): cv.pin,
+            cv.Required('s1_pin'): cv.gpio_pin,  # Correct method for GPIO pin
+            cv.Required('s2_pin'): cv.gpio_pin,
+            cv.Required('s3_pin'): cv.gpio_pin,
             cv.Optional(CONF_NAME, default="Turbidity Sensor"): cv.string,
         }
     )
