@@ -1,27 +1,24 @@
- void setup() override {
-    // Any setup code needed for the turbidity sensor
-  }
+#pragma once
 
-  void update() override {
-    expander_->select_channel(channel_);
-    
-    // Read data from the sensor via UART
-    // This is a placeholder. You'll need to implement the actual communication protocol
-    // with your turbidity sensor here.
-    
-    char buffer[32];
-    if (available()) {
-      size_t bytes_read = read_line(buffer, sizeof(buffer));
-      if (bytes_read > 0) {
-        float value = atof(buffer);
-        publish_state(value);
-      }
-    }
-  }
+#include "esphome/core/component.h"
+#include "esphome/components/sensor/sensor.h"
+#include "esphome/components/uart/uart.h"
 
+namespace esphome {
+namespace turbidity_sensor {
+
+class TurbiditySensor : public sensor::Sensor, public Component {
+ public:
+  void set_expander(Component *expander) { expander_ = expander; }
+  void set_channel(uint8_t channel) { channel_ = channel; }
+  
+  void setup() override;
+  void loop() override;
+  void update() override;
+  
  protected:
-  atlas_serial_expander::AtlasSerialExpander *expander_;
-  uint8_t channel_;
+  Component *expander_{nullptr};
+  uint8_t channel_{0};
 };
 
 }  // namespace turbidity_sensor
