@@ -19,13 +19,17 @@ void TurbiditySensor::update() {
   expander_->select_channel(channel_);
   
   // Read data from the sensor via UART
-  // This is a placeholder. Implement your actual sensor reading logic here.
   std::string buffer;
   uint8_t c;
-  while (uart_->available() > 0 && (c = uart_->read()) != '\n') {
-    if (c == '\r')
-      continue;
-    buffer += (char)c;
+  while (uart_->available() > 0) {
+    if (uart_->read_byte(&c)) {
+      if (c == '\n') {
+        break;
+      }
+      if (c != '\r') {
+        buffer += static_cast<char>(c);
+      }
+    }
   }
   
   if (!buffer.empty()) {
