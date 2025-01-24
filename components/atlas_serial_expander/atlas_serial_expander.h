@@ -2,6 +2,9 @@
 
 #include "esphome.h"
 
+namespace esphome {
+namespace atlas_serial_expander {
+
 class AtlasSerialExpander : public Component {
  public:
   AtlasSerialExpander() = default;
@@ -29,3 +32,6 @@ class AtlasSerialExpander : public Component {
   GPIOPin *s2_pin_;
   GPIOPin *s3_pin_;
 };
+
+}  // namespace atlas_serial_expander
+}  // namespace esphome
