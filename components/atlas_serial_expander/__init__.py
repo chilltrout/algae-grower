@@ -14,9 +14,9 @@ CONF_S3_PIN = 's3_pin'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required(CONF_S1_PIN): cv.int_,
-    cv.Required(CONF_S2_PIN): cv.int_,
-    cv.Required(CONF_S3_PIN): cv.int_,
+    cv.Required('s1_pin'): gpio.gpio_output_pin_schema,
+    cv.Required('s2_pin'): gpio.gpio_output_pin_schema,
+    cv.Required('s3_pin'): gpio.gpio_output_pin_schema,
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
