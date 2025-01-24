@@ -2,8 +2,9 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor, uart
 from esphome.const import CONF_ID, CONF_CHANNEL
+from .. import atlas_serial_expander
 
-DEPENDENCIES = ['uart']
+DEPENDENCIES = ['uart', 'atlas_serial_expander']
 AUTO_LOAD = ['sensor']
 
 CONF_EXPANDER_ID = 'expander_id'
@@ -14,7 +15,7 @@ TurbiditySensor = turbidity_sensor_ns.class_('TurbiditySensor', cg.Component, se
 CONFIG_SCHEMA = sensor.sensor_schema().extend({
     cv.GenerateID(): cv.declare_id(TurbiditySensor),
     cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
-    cv.Required(CONF_EXPANDER_ID): cv.use_id(cg.Component),
+    cv.Required(CONF_EXPANDER_ID): cv.use_id(atlas_serial_expander.AtlasSerialExpander),
     cv.Required('uart_id'): cv.use_id(uart.UARTComponent),
 })
 
