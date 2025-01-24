@@ -5,41 +5,49 @@ namespace esphome {
 namespace turbidity_sensor {
 
 static const char *TAG = "turbidity_sensor";
+static const std::vector<uint8_t> EXPECTED_HEADER = {0x18, 0x05};
 
 void TurbiditySensor::setup() {
-  this->set_timeout(50, [this]() { this->update(); });
+  // Setup code here
 }
 
 void TurbiditySensor::update() {
-  uint8_t request[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
-  this->write_array(request, sizeof(request));
-
-  uint8_t response[8];
-  if (!this->read_array(response, sizeof(response))) {
-    ESP_LOGW(TAG, "Error reading turbidity sensor data");
-    this->status_set_warning();
+  if (expander_ == nullptr || uart_ == nullptr) {
+    ESP_LOGW(TAG, "Expander or UART not set");
     return;
   }
 
-  // Check if the response is valid (frame header and trailer)
-  if (response[0] != 0x18 || response[7] != 0x0D) {
-    ESP_LOGW(TAG, "Invalid response from turbidity sensor");
-    this->status_set_warning();
-    return;
+  expander_->select_channel(channel_);
+  
+  // Send command to request data
+  static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
+  uart_->write_array(COMMAND, sizeof(COMMAND));
+  
+  // Wait for response
+  delay(100);  // Adjust this delay if needed
+
+  // Read data from the sensor via UART
+  std::vector<uint8_t> buffer;
+  while (uart_->available()) {
+    uint8_t c;
+    if (uart_->read_byte(&c)) {
+      buffer.push_back(c);
+    }
   }
-
-  // Extract the turbidity value from the response
-  uint16_t raw_value = (response[5] << 8) | response[6];
-  float turbidity = raw_value / 10.0f;  // Convert to NTU
-
-  ESP_LOGD(TAG, "Turbidity: %.1f NTU", turbidity);
-  this->publish_state(turbidity);
-  this->status_clear_warning();
-}
-
-void TurbiditySensor::dump_config() {
-  ESP_LOGCONFIG(TAG, "Turbidity Sensor:");
-  LOG_SENSOR("  ", "Turbidity", this);
+  
+  if (buffer.size() >= 8) {  // Expecting 8 bytes response
+    // Check if the response starts with the expected header and ends with the trailer
+    if (buffer[0] == 0x18 && buffer[7] == 0x0D) {
+      uint16_t raw_value = (buffer[5] << 8) | buffer[6];
+      float turbidity = raw_value * 0.1f;  // Convert to NTU
+      publish_state(turbidity);
+      ESP_LOGD(TAG, "Turbidity: %.2f NTU", turbidity);
+    } else {
+      ESP_LOGW(TAG, "Invalid response header or trailer");
+    }
+  } else {
+    ESP_LOGW(TAG, "Incomplete response");
+  }
 }
 
 }  // namespace turbidity_sensor
