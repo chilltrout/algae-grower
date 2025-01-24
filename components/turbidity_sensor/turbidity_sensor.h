@@ -17,7 +17,7 @@ class TurbiditySensor : public sensor::Sensor, public PollingComponent {
   void set_channel(uint8_t channel) { channel_ = channel; }
   
   void setup() override;
-  void update() override;  // This now correctly overrides PollingComponent's update method
+  void update() override;
   
  protected:
   uart::UARTComponent *uart_{nullptr};
