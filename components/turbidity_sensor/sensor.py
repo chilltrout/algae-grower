@@ -1,40 +1,53 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome import pins
 from esphome.components import sensor, uart
+from esphome.const import CONF_ID, CONF_NAME
 
-# Define namespace
-CONF_TURBIDITY_SENSOR = "turbidity_sensor"
-turbidity_ns = cg.esphome_ns.namespace(CONF_TURBIDITY_SENSOR)
+DEPENDENCIES = ["uart"]
+
+turbidity_ns = cg.esphome_ns.namespace("turbidity_sensor")
 TurbiditySensor = turbidity_ns.class_("TurbiditySensor", sensor.Sensor, cg.Component)
 
-# Configuration options
-CONFIG_SCHEMA = sensor.sensor_schema().extend({
-    cv.GenerateID(): cv.declare_id(TurbiditySensor),
-    cv.Required("s1_pin"): pins.gpio_output_pin_schema,
-    cv.Required("s2_pin"): pins.gpio_output_pin_schema,
-    cv.Required("s3_pin"): pins.gpio_output_pin_schema,
-    cv.Required("uart_id"): cv.use_id(uart.UARTComponent),
-    cv.Required("channel"): cv.int_range(min=0, max=7),
-})
+CONF_S1_PIN = "s1_pin"
+CONF_S2_PIN = "s2_pin"
+CONF_S3_PIN = "s3_pin"
+CONF_CHANNEL = "channel"
 
-# Register the component
+CONFIG_SCHEMA = (
+    sensor.sensor_schema(unit_of_measurement="NTU", accuracy_decimals=2)
+    .extend(
+        {
+            cv.GenerateID(): cv.declare_id(TurbiditySensor),
+            cv.Required(CONF_NAME): cv.string,
+            cv.Optional(CONF_CHANNEL): cv.int_range(min=0, max=7),
+        }
+    )
+    .extend(uart.UART_DEVICE_SCHEMA)
+)
+
+GLOBAL_PIN_CONFIG_SCHEMA = cv.Schema(
+    {
+        cv.Required(CONF_S1_PIN): cv.int_,
+        cv.Required(CONF_S2_PIN): cv.int_,
+        cv.Required(CONF_S3_PIN): cv.int_,
+    }
+)
+
+global_pins = cg.esphome_ns.struct("TurbidityPinConfig")
+
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_TURBIDITY_SENSOR])
-    await cg.register_component(var, config)
-    await sensor.register_sensor(var, config)
+    uart_component = await cg.get_variable(config[CONF_UART_ID])
+    sensor_var = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(sensor_var, config)
+    await sensor.register_sensor(sensor_var, config)
+    cg.add(sensor_var.set_uart(uart_component))
 
-    # Assign pins
-    s1_pin = await cg.gpio_pin_expression(config["s1_pin"])
-    cg.add(var.set_s1_pin(s1_pin))
-    s2_pin = await cg.gpio_pin_expression(config["s2_pin"])
-    cg.add(var.set_s2_pin(s2_pin))
-    s3_pin = await cg.gpio_pin_expression(config["s3_pin"])
-    cg.add(var.set_s3_pin(s3_pin))
+    if CONF_CHANNEL in config:
+        cg.add(sensor_var.set_channel(config[CONF_CHANNEL]))
 
-    # Assign UART
-    uart_comp = await cg.get_variable(config["uart_id"])
-    cg.add(var.set_uart(uart_comp))
-
-    # Assign channel
-    cg.add(var.set_channel(config["channel"]))
+    # Global pin configuration
+    pins = global_pins()
+    pins.s1 = config[CONF_S1_PIN]
+    pins.s2 = config[CONF_S2_PIN]
+    pins.s3 = config[CONF_S3_PIN]
+    cg.add_global(turbidity_ns.namespace, "pins", pins)
