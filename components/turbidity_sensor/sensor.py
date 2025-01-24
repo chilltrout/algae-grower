@@ -4,6 +4,7 @@ from esphome.components import sensor, uart
 from esphome.const import CONF_ID, CONF_CHANNEL
 
 DEPENDENCIES = ['uart']
+AUTO_LOAD = ['sensor']
 
 CONF_EXPANDER_ID = 'expander_id'
 
@@ -18,7 +19,7 @@ CONFIG_SCHEMA = sensor.sensor_schema().extend({
 })
 
 async def to_code(config):
-    var = await cg.new_Pvariable(config[CONF_ID])
+    var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await sensor.register_sensor(var, config)
 
