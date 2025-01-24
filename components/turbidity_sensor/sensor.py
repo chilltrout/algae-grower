@@ -25,6 +25,7 @@ def to_code(config):
     yield cg.register_component(var, config)
     yield sensor.register_sensor(var, config)
 
+    # Assume these methods exist in your C++ code to set the pins
     cg.add(var.set_s1_pin(config['s1_pin']))
     cg.add(var.set_s2_pin(config['s2_pin']))
     cg.add(var.set_s3_pin(config['s3_pin']))
