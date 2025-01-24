@@ -16,7 +16,7 @@ CONFIG_SCHEMA = sensor.sensor_schema().extend({
     cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
     cv.Required(CONF_EXPANDER_ID): cv.use_id(cg.Component),
     cv.Required('uart_id'): cv.use_id(uart.UARTComponent),
-}).extend(cv.COMPONENT_SCHEMA)
+})
 
 async def to_code(config):
     var = await cg.new_Pvariable(config[CONF_ID])
