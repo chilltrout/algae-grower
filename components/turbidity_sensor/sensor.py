@@ -10,14 +10,14 @@ AUTO_LOAD = ['sensor']
 CONF_EXPANDER_ID = 'expander_id'
 
 turbidity_sensor_ns = cg.esphome_ns.namespace('turbidity_sensor')
-TurbiditySensor = turbidity_sensor_ns.class_('TurbiditySensor', cg.Component, sensor.Sensor)
+TurbiditySensor = turbidity_sensor_ns.class_('TurbiditySensor', cg.PollingComponent, sensor.Sensor)
 
 CONFIG_SCHEMA = sensor.sensor_schema().extend({
     cv.GenerateID(): cv.declare_id(TurbiditySensor),
     cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
     cv.Required(CONF_EXPANDER_ID): cv.use_id(atlas_serial_expander.AtlasSerialExpander),
     cv.Required('uart_id'): cv.use_id(uart.UARTComponent),
-})
+}).extend(cv.polling_component_schema('60s'))
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
