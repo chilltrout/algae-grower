@@ -35,20 +35,20 @@ void TurbiditySensor::update() {
     }
   }
   
-  if (buffer.size() >= 8) {  // Expecting 8 bytes response
-    // Check if the response starts with the expected header and ends with the trailer
-    if (buffer == 0x18 && buffer[7] == 0x0D) {
-      uint16_t raw_value = (buffer[5] << 8) | buffer[6];
-      float turbidity = raw_value * 0.1f;  // Convert to NTU
-      publish_state(turbidity);
-      ESP_LOGD(TAG, "Turbidity: %.2f NTU", turbidity);
-    } else {
-      ESP_LOGW(TAG, "Invalid response header or trailer");
-    }
+if (buffer.size() >= 8) {  // Expecting 8 bytes response
+  // Check if the response starts with the expected header and ends with the trailer
+  if (buffer == 0x18 && buffer[7] == 0x0D) {
+    uint16_t raw_value = (buffer[5] << 8) | buffer[6];
+    float turbidity = raw_value * 0.1f;  // Convert to NTU
+    publish_state(turbidity);
+    ESP_LOGD(TAG, "Turbidity: %.2f NTU", turbidity);
   } else {
-    ESP_LOGW(TAG, "Incomplete response");
+    ESP_LOGW(TAG, "Invalid response header or trailer");
   }
+} else {
+  ESP_LOGW(TAG, "Incomplete response");
 }
+
 
 }  // namespace turbidity_sensor
 }  // namespace esphome
