@@ -1,7 +1,12 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import gpio
 from esphome.const import CONF_ID
+
+# Try to load GPIO component programmatically
+try:
+    from esphome.components import gpio
+except ImportError:
+    import esphome.components.gpio as gpio
 
 DEPENDENCIES = ['gpio']
 
@@ -14,17 +19,17 @@ CONF_S3_PIN = 's3_pin'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required('s1_pin'): gpio.gpio_output_pin_schema,
-    cv.Required('s2_pin'): gpio.gpio_output_pin_schema,
-    cv.Required('s3_pin'): gpio.gpio_output_pin_schema,
+    cv.Required(CONF_S1_PIN): cv.int_,
+    cv.Required(CONF_S2_PIN): cv.int_,
+    cv.Required(CONF_S3_PIN): cv.int_,
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
-    s1 = await gpio.setup_gpio_output_pin(config['s1_pin'])
-    s2 = await gpio.setup_gpio_output_pin(config['s2_pin'])
-    s3 = await gpio.setup_gpio_output_pin(config['s3_pin'])
+    s1 = await cg.gpio_pin_expression(config[CONF_S1_PIN])
+    s2 = await cg.gpio_pin_expression(config[CONF_S2_PIN])
+    s3 = await cg.gpio_pin_expression(config[CONF_S3_PIN])
 
     cg.add(var.set_pins(s1, s2, s3))
