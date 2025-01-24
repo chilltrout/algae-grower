@@ -37,6 +37,3 @@ class TurbiditySensor : public sensor::Sensor, public Component {
   UARTComponent *uart_;
   TurbidityPlatform *platform_;
 };
-
-}  // namespace turbidity_sensor
-}  // namespace esphome
