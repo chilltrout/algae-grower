@@ -4,8 +4,13 @@
 
 class AtlasSerialExpander : public Component {
  public:
-  AtlasSerialExpander(GPIOPin *s1_pin, GPIOPin *s2_pin, GPIOPin *s3_pin)
-      : s1_pin_(s1_pin), s2_pin_(s2_pin), s3_pin_(s3_pin) {}
+  AtlasSerialExpander() = default;
+
+  void set_pins(GPIOPin *s1_pin, GPIOPin *s2_pin, GPIOPin *s3_pin) {
+    s1_pin_ = s1_pin;
+    s2_pin_ = s2_pin;
+    s3_pin_ = s3_pin;
+  }
 
   void setup() override {
     s1_pin_->setup();
