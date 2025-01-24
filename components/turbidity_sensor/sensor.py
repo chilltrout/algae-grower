@@ -1,56 +1,42 @@
-import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, uart
-from esphome.const import CONF_ID, CONF_NAME, CONF_CHANNEL, CONF_UART_ID
+import esphome.codegen as cg
+from esphome import pins
+from esphome.components import uart, sensor
+from esphome.const import CONF_ID, CONF_NAME
 
-DEPENDENCIES = ['uart']
-
+# Define a namespace for the turbidity sensor
 turbidity_ns = cg.esphome_ns.namespace('turbidity_sensor')
-TurbiditySensor = turbidity_ns.class_('TurbiditySensor', sensor.Sensor, cg.Component)
-TurbidityPlatform = turbidity_ns.class_('TurbidityPlatform', cg.Component)
+TurbiditySensor = turbidity_ns.class_('TurbiditySensor', sensor.Sensor, cg.PollingComponent)
 
-CONF_S1_PIN = 's1_pin'
-CONF_S2_PIN = 's2_pin'
-CONF_S3_PIN = 's3_pin'
+# Configuration schema for your component
+CONFIG_SCHEMA = (
+    sensor.sensor_schema(TurbiditySensor)
+    .extend(
+        {
+            cv.Required(CONF_ID): cv.declare_id(TurbiditySensor),
+            cv.Required('s1_pin'): cv.GPIO_PIN,
+            cv.Required('s2_pin'): cv.GPIO_PIN,
+            cv.Required('s3_pin'): cv.GPIO_PIN,
+            cv.Optional(CONF_NAME, default="Turbidity Sensor"): cv.string,
+        }
+    )
+    .extend(uart.UART_DEVICE_SCHEMA)
+)
 
-turbidity_platform_schema = cv.Schema({
-    cv.Required(CONF_ID): cv.declare_id(TurbidityPlatform),
-    cv.Required(CONF_S1_PIN): cv.pin,
-    cv.Required(CONF_S2_PIN): cv.pin,
-    cv.Required(CONF_S3_PIN): cv.pin,
-})
-
-CONFIG_SCHEMA = sensor.sensor_schema().extend({
-    cv.GenerateID(): cv.declare_id(TurbiditySensor),
-    cv.Required(CONF_NAME): cv.string,
-    cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
-    cv.Required(CONF_UART_ID): cv.use_id(uart.UARTComponent),
-}).extend(cv.COMPONENT_SCHEMA)
-
+# Method to translate YAML configuration keys into C++ code
 def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID], config[CONF_NAME])
+    # Create a new variable for the turbidity sensor
+    var = cg.new_Pvariable(config[CONF_ID])
+    # Register the component within ESPHome
     yield cg.register_component(var, config)
+    # Register the sensor so it can be used
     yield sensor.register_sensor(var, config)
 
-    platform = cg.global_ns.get('turbidity_platform')
-    var.set_platform(platform)
+    # Set the pins from the configuration
+    cg.add(var.set_s1_pin(config['s1_pin']))
+    cg.add(var.set_s2_pin(config['s2_pin']))
+    cg.add(var.set_s3_pin(config['s3_pin']))
 
-    uart_component = yield cg.get_variable(config[CONF_UART_ID])
-    var.set_uart_id(uart_component)
-
-    var.set_channel(config[CONF_CHANNEL])
-
-def turbidity_platform_to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
-
-    s1_pin = yield cg.gpio_pin_expression(config[CONF_S1_PIN])
-    var.set_s1_pin(s1_pin)
-
-    s2_pin = yield cg.gpio_pin_expression(config[CONF_S2_PIN])
-    var.set_s2_pin(s2_pin)
-
-    s3_pin = yield cg.gpio_pin_expression(config[CONF_S3_PIN])
-    var.set_s3_pin(s3_pin)
-
-    cg.add_global(turbidity_ns.namespace().set_platform(var))
+    # Associate the UART configuration with the turbidity sensor
+    uart_var = yield cg.get_variable(config[uart.CONF_UART_ID])
+    cg.add(var.set_uart(uart_var))
