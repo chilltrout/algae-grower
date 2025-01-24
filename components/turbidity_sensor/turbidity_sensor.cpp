@@ -10,10 +10,6 @@ void TurbiditySensor::setup() {
   // Setup code here
 }
 
-void TurbiditySensor::loop() {
-  // Loop code here (if needed)
-}
-
 void TurbiditySensor::update() {
   if (expander_ == nullptr || uart_ == nullptr) {
     ESP_LOGW(TAG, "Expander or UART not set");
@@ -24,9 +20,16 @@ void TurbiditySensor::update() {
   
   // Read data from the sensor via UART
   // This is a placeholder. Implement your actual sensor reading logic here.
-  char buffer[32];
-  if (uart_->read_line(buffer, sizeof(buffer))) {
-    float value = atof(buffer);
+  std::string buffer;
+  uint8_t c;
+  while (uart_->available() > 0 && (c = uart_->read()) != '\n') {
+    if (c == '\r')
+      continue;
+    buffer += (char)c;
+  }
+  
+  if (!buffer.empty()) {
+    float value = atof(buffer.c_str());
     publish_state(value);
   }
 }
