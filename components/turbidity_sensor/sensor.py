@@ -15,9 +15,9 @@ CONF_S3_PIN = 's3_pin'
 
 turbidity_platform_schema = cv.Schema({
     cv.Required(CONF_ID): cv.declare_id(TurbidityPlatform),
-    cv.Required(CONF_S1_PIN): cv.gpio_pin_schema,
-    cv.Required(CONF_S2_PIN): cv.gpio_pin_schema,
-    cv.Required(CONF_S3_PIN): cv.gpio_pin_schema,
+    cv.Required(CONF_S1_PIN): cv.pin,
+    cv.Required(CONF_S2_PIN): cv.pin,
+    cv.Required(CONF_S3_PIN): cv.pin,
 })
 
 CONFIG_SCHEMA = sensor.sensor_schema().extend({
