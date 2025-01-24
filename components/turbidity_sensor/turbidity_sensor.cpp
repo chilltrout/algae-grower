@@ -5,7 +5,7 @@ namespace esphome {
 namespace turbidity_sensor {
 
 static const char *TAG = "turbidity_sensor";
-static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
+static const std::vector<uint8_t> EXPECTED_HEADER = {0x18, 0x05};
 
 void TurbiditySensor::setup() {
   // Setup code here
@@ -20,6 +20,7 @@ void TurbiditySensor::update() {
   expander_->select_channel(channel_);
   
   // Send command to request data
+  static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
   uart_->write_array(COMMAND, sizeof(COMMAND));
   
   // Wait for response
@@ -35,14 +36,14 @@ void TurbiditySensor::update() {
   }
   
   if (buffer.size() >= 8) {  // Expecting 8 bytes response
-    // Parse the response
-    if (buffer == 0x18 && buffer[1] == 0x05) {
+    // Check if the response starts with the expected header
+    if (std::equal(EXPECTED_HEADER.begin(), EXPECTED_HEADER.end(), buffer.begin())) {
       uint16_t ad_value = (buffer[3] << 8) | buffer[4];
       float turbidity = ad_value * 0.1f;  // Convert to NTU (adjust this formula if needed)
       publish_state(turbidity);
       ESP_LOGD(TAG, "Turbidity: %.2f NTU", turbidity);
     } else {
-      ESP_LOGW(TAG, "Invalid response");
+      ESP_LOGW(TAG, "Invalid response header");
     }
   } else {
     ESP_LOGW(TAG, "Incomplete response");
