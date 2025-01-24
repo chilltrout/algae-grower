@@ -1,0 +1,5 @@
+name: "Turbidity Sensor"
+domain: "turbidity_sensor"
+codeowners:
+  - "@chilltrout"
+requirements: []
