@@ -10,7 +10,7 @@ namespace turbidity_sensor {
 
 class TurbiditySensor : public sensor::Sensor, public PollingComponent {
  public:
-  TurbiditySensor() : PollingComponent(15000) {} // Poll every 15 seconds
+  TurbiditySensor() : PollingComponent(2000) {} // Poll every 15 seconds
 
   void set_uart(uart::UARTComponent *uart) { uart_ = uart; }
   void set_expander(atlas_serial_expander::AtlasSerialExpander *expander) { expander_ = expander; }
