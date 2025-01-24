@@ -2,12 +2,6 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.const import CONF_ID
 
-# Try to load GPIO component programmatically
-try:
-    from esphome.components import gpio
-except ImportError:
-    import esphome.components.gpio as gpio
-
 DEPENDENCIES = ['gpio']
 
 atlas_serial_expander_ns = cg.esphome_ns.namespace('atlas_serial_expander')
@@ -19,9 +13,9 @@ CONF_S3_PIN = 's3_pin'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AtlasSerialExpander),
-    cv.Required(CONF_S1_PIN): cv.int_,
-    cv.Required(CONF_S2_PIN): cv.int_,
-    cv.Required(CONF_S3_PIN): cv.int_,
+    cv.Required(CONF_S1_PIN): cv.gpio_pin,
+    cv.Required(CONF_S2_PIN): cv.gpio_pin,
+    cv.Required(CONF_S3_PIN): cv.gpio_pin,
 }).extend(cv.COMPONENT_SCHEMA)
 
 async def to_code(config):
