@@ -32,21 +32,17 @@ void TurbiditySensor::update() {
     uint8_t c;
     if (uart_->read_byte(&c)) {
       buffer.push_back(c);
+      if (buffer.size() >= 5) break;  // We have a complete frame
     }
   }
   
-  if (buffer.size() >= 8) {  // Expecting 8 bytes response
-    // Check if the response starts with the expected header and ends with the trailer
-    if (buffer[0] == 0x18 && buffer[7] == 0x0D) {
-      uint16_t raw_value = (buffer[5] << 8) | buffer[6];
-      float turbidity = raw_value * 0.1f;  // Convert to NTU
-      publish_state(turbidity);
-      ESP_LOGD(TAG, "Turbidity: %.2f NTU", turbidity);
-    } else {
-      ESP_LOGW(TAG, "Invalid response header or trailer");
-    }
+  if (buffer.size() >= 5) {  // Expecting 5 bytes response
+    uint8_t turbidity_raw = buffer[3];  // Use the 4th byte as the turbidity value
+    float turbidity = turbidity_raw * 0.1f;  // Convert to NTU (adjust this conversion if needed)
+    publish_state(turbidity);
+    ESP_LOGD(TAG, "Raw: %d, Turbidity: %.1f NTU", turbidity_raw, turbidity);
   } else {
-    ESP_LOGW(TAG, "Incomplete response");
+    ESP_LOGW(TAG, "Incomplete response: received %d bytes", buffer.size());
   }
 }
 
