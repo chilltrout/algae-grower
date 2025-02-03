@@ -38,7 +38,7 @@ void TurbiditySensor::update() {
   
   if (buffer.size() >= 5) {  // Expecting 5 bytes response
     uint8_t turbidity_raw = buffer[3];  // Use the 4th byte as the turbidity value
-    float turbidity = turbidity_raw * 0.1f;  // Convert to NTU (adjust this conversion if needed)
+    float turbidity = turbidity_raw;  // Convert to NTU (adjust this conversion if needed)
     publish_state(turbidity);
     ESP_LOGD(TAG, "Raw: %d, Turbidity: %.1f NTU", turbidity_raw, turbidity);
   } else {
