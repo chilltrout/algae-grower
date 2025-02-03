@@ -20,7 +20,7 @@ void TurbiditySensor::update() {
   expander_->select_channel(channel_);
   
   // Send command to request data
-  static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x02, 0x0D};
+  static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
   uart_->write_array(COMMAND, sizeof(COMMAND));
   
   // Wait for response
