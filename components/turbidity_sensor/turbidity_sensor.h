@@ -4,26 +4,25 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
 #include "../atlas_serial_expander/atlas_serial_expander.h"
+#pragma once
 
-namespace esphome {
-namespace turbidity_sensor {
+#include "esphome.h"
 
-class TurbiditySensor : public sensor::Sensor, public PollingComponent {
+class TurbiditySensor : public Component, public UARTDevice {
  public:
-  TurbiditySensor() : PollingComponent(2000) {} // Poll every 2 seconds
+  Sensor *turbidity_sensor = nullptr;  // Turbidity (dirty value) sensor
+  Sensor *adc_sensor = nullptr;        // ADC value sensor
 
-  void set_uart(uart::UARTComponent *uart) { uart_ = uart; }
-  void set_expander(atlas_serial_expander::AtlasSerialExpander *expander) { expander_ = expander; }
-  void set_channel(uint8_t channel) { channel_ = channel; }
-  
-  void setup() override;
-  void update() override;
-  
- protected:
-  uart::UARTComponent *uart_{nullptr};
-  atlas_serial_expander::AtlasSerialExpander *expander_{nullptr};
-  uint8_t channel_{0};
+  explicit TurbiditySensor(UARTComponent *parent) : UARTDevice(parent) {}
+
+  void setup() override {}
+
+  void loop() override {
+    this->read_turbidity();
+    this->read_adc();
+  }
+
+  void read_turbidity();
+  void read_adc();
 };
 
-}  // namespace turbidity_sensor
-}  // namespace esphome
