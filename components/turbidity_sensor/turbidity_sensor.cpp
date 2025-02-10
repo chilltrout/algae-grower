@@ -1,50 +1,49 @@
 #include "turbidity_sensor.h"
-#include "esphome/core/log.h"
 
-namespace esphome {
-namespace turbidity_sensor {
+void TurbiditySensor::read_turbidity() {
+  const uint8_t request[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
+  this->write_array(request, sizeof(request));
+  delay(5);  // Allow the sensor to respond
 
-static const char *TAG = "turbidity_sensor";
-static const std::vector<uint8_t> EXPECTED_HEADER = {0x18, 0x05};
+  if (this->available() >= 5) {
+    uint8_t response[5];
+    this->read_array(response, 5);
 
-void TurbiditySensor::setup() {
-  // Setup code here
-}
-
-void TurbiditySensor::update() {
-  if (expander_ == nullptr || uart_ == nullptr) {
-    ESP_LOGW(TAG, "Expander or UART not set");
-    return;
-  }
-
-  expander_->select_channel(channel_);
-  
-  // Send command to request data
-  static const uint8_t COMMAND[] = {0x18, 0x05, 0x00, 0x01, 0x0D};
-  uart_->write_array(COMMAND, sizeof(COMMAND));
-  
-  // Wait for response
-  delay(100);  // Adjust this delay if needed
-
-  // Read data from the sensor via UART
-  std::vector<uint8_t> buffer;
-  while (uart_->available()) {
-    uint8_t c;
-    if (uart_->read_byte(&c)) {
-      buffer.push_back(c);
-      if (buffer.size() >= 5) break;  // We have a complete frame
+    // Validate static parts of the response
+    if (response[0] == 0x18 && response[1] == 0x05 && response[4] == 0x0D) {
+      // Extract dynamic data (turbidity value)
+      uint8_t turbidity_value = response[3];
+      if (this->turbidity_sensor != nullptr) {
+        this->turbidity_sensor->publish_state(static_cast<float>(turbidity_value));
+      }
+    } else {
+      ESP_LOGW("TurbiditySensor", "Invalid turbidity response received");
     }
-  }
-  
-  if (buffer.size() >= 5) {  // Expecting 5 bytes response
-    uint8_t turbidity_raw = buffer[3];  // Use the 4th byte as the turbidity value
-    float turbidity = turbidity_raw;  // Convert to NTU (adjust this conversion if needed)
-    publish_state(turbidity);
-    ESP_LOGD(TAG, "Raw: %d, Turbidity: %.1f NTU", turbidity_raw, turbidity);
   } else {
-    ESP_LOGW(TAG, "Incomplete response: received %d bytes", buffer.size());
+    ESP_LOGW("TurbiditySensor", "No response received for turbidity");
   }
 }
 
-}  // namespace turbidity_sensor
-}  // namespace esphome
+void TurbiditySensor::read_adc() {
+  const uint8_t request[] = {0x18, 0x05, 0x00, 0x02, 0x0D};
+  this->write_array(request, sizeof(request));
+  delay(5);  // Allow the sensor to respond
+
+  if (this->available() >= 6) {
+    uint8_t response[6];
+    this->read_array(response, 6);
+
+    // Validate static parts of the response
+    if (response[0] == 0x18 && response[1] == 0x06 && response[5] == 0x0D) {
+      // Extract dynamic data (12-bit ADC value)
+      uint16_t adc_value = (response[3] << 8) | response[4];
+      if (this->adc_sensor != nullptr) {
+        this->adc_sensor->publish_state(static_cast<float>(adc_value));
+      }
+    } else {
+      ESP_LOGW("TurbiditySensor", "Invalid ADC response received");
+    }
+  } else {
+    ESP_LOGW("TurbiditySensor", "No response received for ADC");
+  }
+}
