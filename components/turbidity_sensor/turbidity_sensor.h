@@ -1,28 +1,23 @@
 #pragma once
 
-#include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
-#include "esphome/components/uart/uart.h"
-#include "../atlas_serial_expander/atlas_serial_expander.h"
-#pragma once
-
 #include "esphome.h"
+
+namespace esphome {
+namespace turbidity_sensor {
 
 class TurbiditySensor : public Component, public UARTDevice {
  public:
-  Sensor *turbidity_sensor = nullptr;  // Turbidity (dirty value) sensor
-  Sensor *adc_sensor = nullptr;        // ADC value sensor
+  TurbiditySensor(UARTComponent *parent) : UARTDevice(parent) {}
 
-  explicit TurbiditySensor(UARTComponent *parent) : UARTDevice(parent) {}
+  void set_turbidity_sensor(Sensor *sensor) { turbidity_sensor_ = sensor; }
+  void set_adc_sensor(Sensor *sensor) { adc_sensor_ = sensor; }
 
-  void setup() override {}
+  void read_sensors();
 
-  void loop() override {
-    this->read_turbidity();
-    this->read_adc();
-  }
-
-  void read_turbidity();
-  void read_adc();
+ protected:
+  Sensor *turbidity_sensor_{nullptr};
+  Sensor *adc_sensor_{nullptr};
 };
 
+}  // namespace turbidity_sensor
+}  // namespace esphome
