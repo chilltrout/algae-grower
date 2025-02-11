@@ -14,19 +14,20 @@ enum class TurbiditySensorType {
 
 class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
  public:
-  void set_type(TurbiditySensorType type) { this->type_ = type; }
-  void set_turbidity_sensor(sensor::Sensor *turbidity_sensor) { this->turbidity_sensor_ = turbidity_sensor; }
-  void set_adc_sensor(sensor::Sensor *adc_sensor) { this->adc_sensor_ = adc_sensor; }
+    void set_type(TurbiditySensorType type) { this->type_ = type; }
+    void set_turbidity_sensor(sensor::Sensor *turbidity_sensor) { this->turbidity_sensor_ = turbidity_sensor; }
+    void set_adc_sensor(sensor::Sensor *adc_sensor) { this->adc_sensor_ = adc_sensor; }
+protected:
+    void update() override;
+    void request_data_();
+    bool wait_for_response_();
+    void process_response_();
+    float extract_value(const std::vector<uint8_t> &response);
 
- protected:
-  void update() override;
-  void process_response_();
-  float extract_value(const std::vector<uint8_t> &response);
-
-  TurbiditySensorType type_ = TurbiditySensorType::TURBIDITY;
-  sensor::Sensor *turbidity_sensor_{nullptr};
-  sensor::Sensor *adc_sensor_{nullptr};
-  std::vector<uint8_t> rx_buffer_;
+    TurbiditySensorType type_ = TurbiditySensorType::TURBIDITY;
+    sensor::Sensor *turbidity_sensor_{nullptr};
+    sensor::Sensor *adc_sensor_{nullptr};
+    std::vector<uint8_t> rx_buffer_;
 };
 
 }  // namespace turbidity_sensor
