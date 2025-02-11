@@ -6,7 +6,7 @@ from esphome.const import CONF_ID, CONF_NAME, UNIT_EMPTY, ICON_EMPTY
 DEPENDENCIES = ["uart", "atlas_serial_expander"]
 
 turbidity_ns = cg.esphome_ns.namespace("turbidity_sensor")
-TurbiditySensor = turbidity_ns.class_("TurbiditySensor", cg.PollingComponent, uart.UARTDevice)
+TurbiditySensor = turbidity_ns.class_("TurbiditySensor", cg.PollingComponent, sensor.Sensor)
 
 CONF_TURBIDITY_SENSOR = "turbidity_sensor"
 CONF_ADC_SENSOR = "adc_sensor"
