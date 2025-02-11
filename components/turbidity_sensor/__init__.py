@@ -1,4 +1,3 @@
-from .sensor import CONFIG_SCHEMA, TurbiditySensor
-
+from . import sensor
 DEPENDENCIES = ['uart']
 AUTO_LOAD = ['sensor']
