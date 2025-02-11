@@ -21,11 +21,13 @@ class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
     void set_uart_parent(uart::UARTDevice *uart_parent) { this->uart_parent_ = uart_parent; }
   void set_expander_parent(esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent) { this->expander_parent_ = expander_parent; }
   void set_channel(uint8_t channel) { this->channel_ = channel; }
+  
 
  protected:
   void update() override;
   void process_response_();
   float extract_value(const std::vector<uint8_t> &response);
+  
 
   TurbiditySensorType type_ = TurbiditySensorType::TURBIDITY;
   sensor::Sensor *turbidity_sensor_{nullptr};
