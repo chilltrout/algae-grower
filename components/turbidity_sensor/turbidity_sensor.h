@@ -24,13 +24,14 @@ class TurbiditySensor : public PollingComponent, public sensor::Sensor {
   void update() override;
   void request_data_();
   bool wait_for_response_();
-  bool parse_response_(const std::vector<uint8_t> &response, float &value);
+  bool parse_response_(float &value);
 
  private:
   uart::UARTComponent *uart_parent_{nullptr};
   esphome::atlas_serial_expander::AtlasSerialExpander *expander_parent_{nullptr};
   uint8_t channel_{0};
   TurbiditySensorType type_{TurbiditySensorType::TURBIDITY};
+  std::vector<uint8_t> rx_buffer_;
 };
 
 }  // namespace turbidity_sensor
