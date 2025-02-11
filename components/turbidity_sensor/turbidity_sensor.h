@@ -2,6 +2,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
+#include "esphome/core/polling.h"
 #include "esphome/components/atlas_serial_expander/atlas_serial_expander.h"
 
 namespace esphome {
@@ -17,7 +18,7 @@ struct TurbiditySensorConfig {
   TurbiditySensorType type;
 };
 
-class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
+class TurbiditySensor : public PollingComponent, public sensor::Sensor {
  public:
   void set_channel(int channel) { channel_ = channel; }
   int get_channel() const { return channel_; }
@@ -34,8 +35,8 @@ class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
   float get_setup_priority() const override { return esphome::setup_priority::DATA; }
 
  protected:
-  void request_data_();
-  void read_data_();
+  virtual void request_data_();
+  virtual void read_data_();
 
   int channel_{0};
   TurbiditySensorType type_{TurbiditySensorType::TURBIDITY};
