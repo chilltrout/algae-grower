@@ -13,7 +13,7 @@ enum class TurbiditySensorType {
   ADC,
 };
 
-class TurbiditySensor : public esphome::uart::UARTDevice, public PollingComponent {
+class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
  public:
   void set_expander_parent(esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent) { this->expander_parent_ = expander_parent; }
   void set_type(TurbiditySensorType type) { this->type_ = type; }
