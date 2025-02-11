@@ -45,4 +45,4 @@ async def to_code(config):
     if config[CONF_TYPE] == "turbidity":
         cg.add(var.set_type(cg.RawExpression("turbidity_sensor::TurbiditySensorType::TURBIDITY")))
     elif config[CONF_TYPE] == "adc":
-        cg.add(var.set_type(cg.RawExpression("turbidity_sensor::TurbiditySensorType::ADC
+        cg.add(var.set_type(cg.RawExpression("turbidity_sensor::TurbiditySensorType::ADC")))
