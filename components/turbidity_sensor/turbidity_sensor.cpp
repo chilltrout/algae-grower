@@ -35,12 +35,12 @@ void TurbiditySensor::request_data_() {
   
     if (this->uart_parent_ != nullptr){
         for (size_t i = 0; i < 8; ++i) {
-            this->uart_parent_->write(command[i]);
+            uart_parent_->write(command[i]);
         }
 
         rx_buffer_.clear();
-        while (this->uart_parent_->available()) {
-            uint8_t byte = this->uart_parent_->read();
+        while (uart_parent_->available()) {
+            uint8_t byte = uart_parent_->read();
             rx_buffer_.push_back(byte);
         }
     }
