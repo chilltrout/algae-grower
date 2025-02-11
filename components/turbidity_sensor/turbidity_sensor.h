@@ -18,7 +18,7 @@ struct TurbiditySensorConfig {
   TurbiditySensorType type;
 };
 
-class TurbiditySensor : public PollingComponent, public sensor::Sensor {
+class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
  public:
   void set_channel(int channel) { channel_ = channel; }
   int get_channel() const { return channel_; }
