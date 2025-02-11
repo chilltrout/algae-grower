@@ -1,63 +1,37 @@
-// turbidity_sensor.cpp
 #include "turbidity_sensor.h"
 #include "esphome/core/log.h"
-#include "esphome/core/helpers.h"
 
 namespace esphome {
 namespace turbidity_sensor {
 
-static const char *TAG = "turbidity_sensor";
-
-void TurbiditySensor::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up Turbidity Sensor on channel %u", this->channel_);
-}
+static const char *const TAG = "turbidity.sensor";
 
 void TurbiditySensor::update() {
-  if (this->expander_ != nullptr) {
-    this->expander_->select_channel(this->channel_);
+  if (this->expander_parent_ != nullptr) {
+    this->expander_parent_->select_channel(channel_);
   }
-  this->request_dirty_();
-  if (!this->wait_for_response_()) {
-    ESP_LOGW(TAG, "No response for dirty value");
-    return;
-  }
-  delay(100);
-  this->request_adc_();
-  if (!this->wait_for_response_()) {
-    ESP_LOGW(TAG, "No response for ADC value");
+  request_data_();
+  if (!wait_for_response_()) {
+    ESP_LOGW(TAG, "No response from turbidity sensor");
     return;
   }
 }
 
-void TurbiditySensor::request_dirty_() {
-  if (this->uart_ == nullptr) {
-    ESP_LOGE(TAG, "UART not set for Turbidity Sensor");
-    return;
-  }
-  
-  uint8_t command[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x85, 0xDB};
-  this->uart_->write_array(command, sizeof(command));
+void TurbiditySensor::request_data_() {
+    std::vector<uint8_t> command;
+    if (type_ == TurbiditySensorType::TURBIDITY) {
+        command = {0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x0A}; // Example dirty command
+    } else {
+        command = {0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0xD5, 0xCA}; // Example ADC command
+    }
+    write_command_(command);
 }
 
-void TurbiditySensor::request_adc_() {
-  if (this->uart_ == nullptr) {
-    ESP_LOGE(TAG, "UART not set for Turbidity Sensor");
-    return;
-  }
-  
-  uint8_t command[] = {0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0xD5, 0xDB};
-  this->uart_->write_array(command, sizeof(command));
-}
 
 bool TurbiditySensor::wait_for_response_() {
-  uint32_t start_time = millis();
-  while (millis() - start_time < 500) {  // 500ms timeout
-    if (this->uart_->available() >= 7) {
-      return true;
-    }
-    delay(10);
-  }
-  return false;
+  // Implement your waiting and timeout logic here
+  // Return true if a valid response is received, false otherwise
+  return true; // Replace with actual implementation
 }
 
 bool TurbiditySensor::parse_dirty_response_(const std::vector<uint8_t> &response, float &value) {
@@ -65,16 +39,20 @@ bool TurbiditySensor::parse_dirty_response_(const std::vector<uint8_t> &response
     ESP_LOGW(TAG, "Invalid response from sensor: incorrect header or length for dirty");
     return false;
   }
-  
-  value = static_cast<float>(response[3]); // 0-255 range
+
+  uint16_t raw_value = (response[3] << 8) | response[4]; // 0-4096 range
+  value = static_cast<float>(raw_value);
 
   uint16_t received_crc = (response[5] << 8) | response[6];
   uint16_t calculated_crc = esphome::crc16(&response[0], response.size() - 2);
   if (received_crc != calculated_crc) {
-    ESP_LOGW(TAG, "CRC mismatch (Dirty): Expected %04X, Got %04X", calculated_crc, received_crc);
+    ESP_LOGW(TAG, "CRC mismatch (dirty): Expected %04X, Got %04X", calculated_crc, received_crc);
     return false;
   }
 
+  if (this->turbidity_sensor_ != nullptr){
+      this->turbidity_sensor_->publish_state(value);
+  }
   return true;
 }
 
@@ -94,7 +72,24 @@ bool TurbiditySensor::parse_adc_response_(const std::vector<uint8_t> &response, 
     return false;
   }
 
+  if (this->adc_sensor_ != nullptr){
+      this->adc_sensor_->publish_state(value);
+  }
+
   return true;
+}
+
+void TurbiditySensor::write_command_(const std::vector<uint8_t>& command) {
+    ESP_LOGD(TAG, "Writing command");
+    this->write_array(command);
+}
+
+std::vector<uint8_t> TurbiditySensor::read_response_() {
+    std::vector<uint8_t> response;
+    while (this->available()) {
+        response.push_back(this->read());
+    }
+    return response;
 }
 
 }  // namespace turbidity_sensor
