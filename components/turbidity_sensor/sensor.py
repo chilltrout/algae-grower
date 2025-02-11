@@ -20,8 +20,6 @@ TYPE_OPTIONS = {
     "adc": turbidity_ns.enum("TURBIDITY_TYPE_ADC"),
 }
 
-DEFAULT_UPDATE_INTERVAL = "60s"  # Set a default update interval of 60 seconds
-
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(TurbiditySensor),
@@ -29,7 +27,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_UART_ID): cv.use_id(uart.UARTDevice),
         cv.Required(CONF_EXPANDER_ID): cv.use_id(cg.global_ns.class_("AtlasSerialExpander")),
         cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
-        cv.Required(CONF_TYPE): cv.enum(TYPE_OPTIONS, upper=True),  # Handle uppercase input
+        cv.Required(CONF_TYPE): cv.enum(TYPE_OPTIONS),  # Removed upper=True
     }
 ).extend(cv.polling_component_schema(DEFAULT_UPDATE_INTERVAL)).extend(uart.UART_DEVICE_SCHEMA)
 
