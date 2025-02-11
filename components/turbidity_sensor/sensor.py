@@ -14,8 +14,8 @@ CONF_EXPANDER_ID = "expander_id"
 CONF_UART_ID = "uart_id"
 
 TURBIDITY_SENSOR_TYPE = cv.enum({
-    "turbidity": "TURBIDITY",
-    "adc": "ADC",
+    "turbidity": 0,
+    "adc": 1,
 })
 
 CONFIG_SCHEMA = cv.Schema(
@@ -23,7 +23,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(TurbiditySensor),
         cv.Required(CONF_NAME): cv.string,
         cv.Required(CONF_UART_ID): cv.use_id(uart.UARTComponent),
-        cv.Required(CONF_TYPE): TURBIDITY_SENSOR_TYPE,
+        cv.Required(CONF_TYPE): cv.enum({"turbidity": 0, "adc": 1}),
         cv.Required(CONF_CHANNEL): cv.int_,
         cv.Optional(CONF_EXPANDER_ID): cv.use_id(cg.Component),
     }
