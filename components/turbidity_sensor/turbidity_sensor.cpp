@@ -30,7 +30,7 @@ void TurbiditySensor::request_data_() {
     }
 
     for (size_t i = 0; i < command_size; ++i) {
-        this->write(command[i]);
+        write(command[i]);
     }
 }
 
@@ -38,11 +38,15 @@ bool TurbiditySensor::wait_for_response_() {
     // Implement your waiting and timeout logic here
     // Return true if a valid response is received, false otherwise
     delay(100); // Short delay to allow response
-    return this->available() > 0; // Check if data is available
+    return available() > 0; // Check if data is available
 }
 
 void TurbiditySensor::process_response_() {
-    float value = extract_value(this->rx_buffer_);
+    while (available()) {
+        uint8_t byte = read();
+        rx_buffer_.push_back(byte);
+    }
+    float value = extract_value(rx_buffer_);
 
     if (type_ == TurbiditySensorType::TURBIDITY && turbidity_sensor_ != nullptr) {
         turbidity_sensor_->publish_state(value);
