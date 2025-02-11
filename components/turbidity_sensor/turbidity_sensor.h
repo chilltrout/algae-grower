@@ -2,7 +2,7 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/uart/uart.h"
-#include "esphome/core/polling_component.h"
+#include "esphome/core/polling.h"
 #include "esphome/components/atlas_serial_expander/atlas_serial_expander.h"
 
 namespace esphome {
@@ -32,6 +32,7 @@ class TurbiditySensor : public PollingComponent, public sensor::Sensor {
   void setup() override;
   void update() override;
   void dump_config() override;
+  float get_setup_priority() const override { return esphome::setup_priority::DATA; }
 
  protected:
   void request_data_();
