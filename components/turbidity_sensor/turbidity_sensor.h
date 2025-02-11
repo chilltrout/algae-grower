@@ -13,7 +13,7 @@ enum class TurbiditySensorType {
   ADC,
 };
 
-class TurbiditySensor : public PollingComponent, public sensor::Sensor {
+class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
  public:
   TurbiditySensor() {}
   void set_uart_parent(uart::UARTComponent *uart_parent) { this->uart_parent_ = uart_parent; }
