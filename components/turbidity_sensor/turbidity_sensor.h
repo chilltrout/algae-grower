@@ -8,15 +8,16 @@ namespace esphome {
 namespace turbidity_sensor {
 
 enum class TurbiditySensorType {
-  TURBIDITY,
-  ADC,
+    TURBIDITY,
+    ADC
 };
 
 class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
- public:
+public:
     void set_type(TurbiditySensorType type) { this->type_ = type; }
     void set_turbidity_sensor(sensor::Sensor *turbidity_sensor) { this->turbidity_sensor_ = turbidity_sensor; }
     void set_adc_sensor(sensor::Sensor *adc_sensor) { this->adc_sensor_ = adc_sensor; }
+
 protected:
     void update() override;
     void request_data_();
