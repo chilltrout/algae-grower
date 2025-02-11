@@ -3,31 +3,39 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
+#include "esphome/components/atlas_serial_expander/atlas_serial_expander.h"
 
 namespace esphome {
 namespace turbidity_sensor {
 
-enum class TURBIDITY_TYPE {
+enum class TurbiditySensorType {
   TURBIDITY,
-  ADC
+  ADC,
 };
 
-class TurbiditySensor : public PollingComponent, public sensor::Sensor {
+class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
  public:
-  void set_uart(uart::UARTComponent *uart) { this->uart_ = uart; }
-  void set_type(TURBIDITY_TYPE type) { this->type_ = type; }
+    void set_uart_parent(uart::UARTDevice *uart_parent) { this->uart_parent_ = uart_parent; }
+    void set_expander_parent(esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent) { this->expander_parent_ = expander_parent; }
+    void set_type(TurbiditySensorType type) { this->type_ = type; }
+    void set_channel(uint8_t channel) { this->channel_ = channel; }
+    void set_turbidity_sensor(sensor::Sensor *turbidity_sensor) { this->turbidity_sensor_ = turbidity_sensor; }
+    void set_adc_sensor(sensor::Sensor *adc_sensor) { this->adc_sensor_ = adc_sensor; }
+
 
  protected:
-  void update() override;
-  void request_dirty_();
-  void request_adc_();
-  bool wait_for_response_();
-  bool parse_dirty_response_(const std::vector<uint8_t> &response, float &value);
-  bool parse_adc_response_(const std::vector<uint8_t> &response, float &value);
+    void update() override;
+    void process_response_();
+    float extract_value(const std::vector<uint8_t> &response);
+    
 
-  TURBIDITY_TYPE type_{TURBIDITY_TYPE::TURBIDITY};
-  uart::UARTComponent *uart_{nullptr};
-  std::vector<uint8_t> rx_buffer_;
+    TurbiditySensorType type_ = TurbiditySensorType::TURBIDITY;
+    sensor::Sensor *turbidity_sensor_{nullptr};
+    sensor::Sensor *adc_sensor_{nullptr};
+    uart::UARTDevice *uart_parent_{nullptr};
+    esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent_{nullptr};
+    uint8_t channel_{0};
+    std::vector<uint8_t> rx_buffer_;
 };
 
 }  // namespace turbidity_sensor
