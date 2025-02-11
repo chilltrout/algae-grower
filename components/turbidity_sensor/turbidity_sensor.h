@@ -1,7 +1,8 @@
 #pragma once
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/uart/uart.h
+#include "esphome/components/uart/uart.h"
+#include "esphome/core/polling.h"
 #include "esphome/components/atlas_serial_expander/atlas_serial_expander.h"
 
 namespace esphome {
@@ -25,8 +26,8 @@ class TurbiditySensor : public PollingComponent, public sensor::Sensor {
   void set_type(TurbiditySensorType type) { type_ = type; }
   TurbiditySensorType get_type() const { return type_; }
 
-  void set_uart_parent(uart::UARTComponent *parent) { uart_parent_ = parent; }
-  void set_expander(atlas_serial_expander::AtlasSerialExpander *expander) { expander_ = expander; }
+  void set_uart_parent(esphome::uart::UARTComponent *parent) { uart_parent_ = parent; }
+  void set_expander(esphome::atlas_serial_expander::AtlasSerialExpander *expander) { expander_ = expander; }
 
   void setup() override;
   void update() override;
@@ -39,8 +40,8 @@ class TurbiditySensor : public PollingComponent, public sensor::Sensor {
 
   int channel_{0};
   TurbiditySensorType type_{TurbiditySensorType::TURBIDITY};
-  uart::UARTComponent *uart_parent_{nullptr};
-  atlas_serial_expander::AtlasSerialExpander *expander_{nullptr};
+  esphome::uart::UARTComponent *uart_parent_{nullptr};
+  esphome::atlas_serial_expander::AtlasSerialExpander *expander_{nullptr};
 };
 
 }  // namespace turbidity_sensor
