@@ -8,8 +8,9 @@ static const char *const TAG = "turbidity.sensor";
 
 void TurbiditySensor::update() {
   if (this->expander_parent_ != nullptr) {
-    this->expander_parent_->select_channel(channel_);
-  }
+        this->expander_parent_->select_channel(channel_);
+    }
+
   static const uint8_t dirty_command[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x0A};
   static const uint8_t adc_command[] = {0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0xD5, 0xCA};
   const uint8_t *command;
