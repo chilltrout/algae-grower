@@ -77,6 +77,7 @@ async def to_code(config):
     cg.add(var.set_expander_parent(expander))
 
     cg.add(var.set_type(config[CONF_TYPE]))
+    cg.add(var.set_channel(config[CONF_CHANNEL]))
 
     # Register dirty sensor (optional)
     if CONF_TURBIDITY_SENSOR in config:
@@ -87,5 +88,3 @@ async def to_code(config):
     if CONF_ADC_SENSOR in config:
         adc_sensor = await sensor.new_sensor(config[CONF_ADC_SENSOR])
         cg.add(var.set_adc_sensor(adc_sensor))
-
-    cg.add(var.set_channel(config[CONF_CHANNEL]))
