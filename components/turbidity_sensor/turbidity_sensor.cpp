@@ -108,4 +108,3 @@ std::vector<uint8_t> TurbiditySensor::read_response_() {
 
 }  // namespace turbidity_sensor
 }  // namespace esphome
-
