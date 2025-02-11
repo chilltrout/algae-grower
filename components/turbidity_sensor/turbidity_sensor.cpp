@@ -10,14 +10,20 @@ void TurbiditySensor::update() {
   static const uint8_t dirty_command[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x0A};
   static const uint8_t adc_command[] = {0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0xD5, 0xCA};
   const uint8_t *command;
+  size_t command_size;
 
   if (type_ == TurbiditySensorType::TURBIDITY) {
     command = dirty_command;
+    command_size = sizeof(dirty_command);
   } else {
     command = adc_command;
+    command_size = sizeof(adc_command);
   }
 
-  this->write(command, sizeof(command));
+  for (size_t i = 0; i < command_size; ++i) {
+    this->write(command[i]);
+  }
+
   this->rx_buffer_.clear();
   delay(100);
 
