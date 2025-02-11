@@ -53,7 +53,7 @@ void TurbiditySensor::request_data_() {
   }
 
   // Schedule reading after a short delay
-  this->set_timeout(100, [this]() { this->read_data_(); });
+  this->set_timeout(100, [this]() { this->request_data_(); });
 }
 
 void TurbiditySensor::read_data_() {
