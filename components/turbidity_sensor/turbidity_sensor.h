@@ -28,6 +28,7 @@ class TurbiditySensor : public PollingComponent, public sensor::Sensor {
   void request_data_();
   bool wait_for_response_();
   bool parse_response_(float &value);
+  
 
  private:
   uart::UARTComponent *uart_parent_{nullptr};
