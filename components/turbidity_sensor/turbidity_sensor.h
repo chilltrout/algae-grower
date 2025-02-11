@@ -41,4 +41,3 @@ class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
 
 }  // namespace turbidity_sensor
 }  // namespace esphome
-
