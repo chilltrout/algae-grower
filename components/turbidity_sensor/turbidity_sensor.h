@@ -36,6 +36,7 @@ class TurbiditySensor : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *adc_sensor_{nullptr};
   uart::UARTDevice *uart_parent_{nullptr};
   esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent_{nullptr};
+  uint8_t channel_{0};
 };
 
 }  // namespace turbidity_sensor
