@@ -15,6 +15,28 @@ void TurbiditySensor::update() {
     ESP_LOGW(TAG, "No response from turbidity sensor");
     return;
   }
+    std::vector<uint8_t> response = read_response_();
+    float value;
+
+    if (type_ == TurbiditySensorType::TURBIDITY) {
+        if (parse_dirty_response_(response, value)) {
+            ESP_LOGD(TAG, "Parsed dirty value: %.2f", value);
+            if (turbidity_sensor_ != nullptr) {
+                turbidity_sensor_->publish_state(value);
+            }
+        } else {
+            ESP_LOGW(TAG, "Failed to parse dirty response");
+        }
+    } else {
+        if (parse_adc_response_(response, value)) {
+            ESP_LOGD(TAG, "Parsed ADC value: %.2f", value);
+            if (adc_sensor_ != nullptr) {
+                adc_sensor_->publish_state(value);
+            }
+        } else {
+            ESP_LOGW(TAG, "Failed to parse ADC response");
+        }
+    }
 }
 
 void TurbiditySensor::request_data_() {
@@ -31,7 +53,8 @@ void TurbiditySensor::request_data_() {
 bool TurbiditySensor::wait_for_response_() {
   // Implement your waiting and timeout logic here
   // Return true if a valid response is received, false otherwise
-  return true; // Replace with actual implementation
+  delay(100); // Short delay to allow response
+  return this->available() > 0; // Check if data is available
 }
 
 bool TurbiditySensor::parse_dirty_response_(const std::vector<uint8_t> &response, float &value) {
@@ -48,10 +71,6 @@ bool TurbiditySensor::parse_dirty_response_(const std::vector<uint8_t> &response
   if (received_crc != calculated_crc) {
     ESP_LOGW(TAG, "CRC mismatch (dirty): Expected %04X, Got %04X", calculated_crc, received_crc);
     return false;
-  }
-
-  if (this->turbidity_sensor_ != nullptr){
-      this->turbidity_sensor_->publish_state(value);
   }
   return true;
 }
@@ -71,11 +90,6 @@ bool TurbiditySensor::parse_adc_response_(const std::vector<uint8_t> &response, 
     ESP_LOGW(TAG, "CRC mismatch (ADC): Expected %04X, Got %04X", calculated_crc, received_crc);
     return false;
   }
-
-  if (this->adc_sensor_ != nullptr){
-      this->adc_sensor_->publish_state(value);
-  }
-
   return true;
 }
 
