@@ -1,4 +1,3 @@
-
 #include "turbidity_sensor.h"
 #include "esphome/core/log.h"
 
