@@ -34,15 +34,19 @@ CONF_ADC_SENSOR = "adc_sensor"
 
 # Sensor Schemas
 TURBIDITY_SENSOR_SCHEMA = sensor.sensor_schema(
-    UNIT_EMPTY,
-    ICON_EMPTY,
-    1,  # Precision for dirty value
+    {
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ICON: ICON_EMPTY,
+        CONF_ACCURACY_DECIMALS: 1,
+    }
 )
 
 ADC_SENSOR_SCHEMA = sensor.sensor_schema(
-    UNIT_EMPTY,
-    ICON_EMPTY,
-    0,  # Precision for raw ADC value
+    {
+        CONF_UNIT_OF_MEASUREMENT: UNIT_EMPTY,
+        CONF_ICON: ICON_EMPTY,
+        CONF_ACCURACY_DECIMALS: 0,
+    }
 )
 
 CONFIG_SCHEMA = cv.Schema(
