@@ -1,7 +1,16 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor, uart
-from esphome.const import CONF_ID, CONF_NAME, CONF_TYPE, UNIT_EMPTY, ICON_EMPTY
+from esphome.const import (
+    CONF_ID,
+    CONF_NAME,
+    CONF_TYPE,
+    UNIT_EMPTY,
+    ICON_EMPTY,
+    CONF_UNIT_OF_MEASUREMENT,
+    CONF_ICON,
+    CONF_ACCURACY_DECIMALS,
+)
 
 DEPENDENCIES = ["uart", "atlas_serial_expander"]
 
@@ -23,6 +32,19 @@ CONF_CHANNEL = "channel"
 CONF_TURBIDITY_SENSOR = "turbidity_sensor"
 CONF_ADC_SENSOR = "adc_sensor"
 
+# Sensor Schemas
+TURBIDITY_SENSOR_SCHEMA = sensor.sensor_schema(
+    UNIT_EMPTY,
+    ICON_EMPTY,
+    1,  # Precision for dirty value
+)
+
+ADC_SENSOR_SCHEMA = sensor.sensor_schema(
+    UNIT_EMPTY,
+    ICON_EMPTY,
+    0,  # Precision for raw ADC value
+)
+
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(TurbiditySensor),
@@ -31,18 +53,11 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_EXPANDER_ID): cv.use_id(cg.global_ns.class_("atlas_serial_expander::AtlasSerialExpander")),
         cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
         cv.Required(CONF_TYPE): cv.enum(TURBIDITY_SENSOR_TYPE_OPTIONS, upper=False),
-        cv.Optional(CONF_TURBIDITY_SENSOR): sensor.sensor_schema(
-            UNIT_EMPTY,
-            ICON_EMPTY,
-            1,  # Precision for dirty value
-        ),
-        cv.Optional(CONF_ADC_SENSOR): sensor.sensor_schema(
-            UNIT_EMPTY,
-            ICON_EMPTY,
-            0,  # Precision for raw ADC value
-        ),
+        cv.Optional(CONF_TURBIDITY_SENSOR): TURBIDITY_SENSOR_SCHEMA,
+        cv.Optional(CONF_ADC_SENSOR): ADC_SENSOR_SCHEMA,
     }
 ).extend(cv.polling_component_schema("60s")).extend(uart.UART_DEVICE_SCHEMA)
+
 
 # Build function to register sensors
 async def to_code(config):
