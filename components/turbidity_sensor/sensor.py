@@ -67,4 +67,3 @@ async def to_code(config):
     if CONF_ADC_SENSOR in config:
       sens = await sensor.new_sensor(config[CONF_ADC_SENSOR])
       cg.add(var.set_adc_sensor(sens))
-
