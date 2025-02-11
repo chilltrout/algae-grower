@@ -89,7 +89,7 @@ void TurbiditySensor::dump_config() {
   ESP_LOGCONFIG(TAG, "  Channel: %d", this->channel_);
   ESP_LOGCONFIG(TAG, "  Type: %s", this->type_ == TurbiditySensorType::TURBIDITY ? "Turbidity" : "ADC");
   LOG_SENSOR("  ", "Turbidity", this);
-  LOG_UPDATE_INTERVAL("  ", this);
+  LOG_UPDATE_INTERVAL(this);
 }
 
 }  // namespace turbidity_sensor
