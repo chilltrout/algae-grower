@@ -2,7 +2,9 @@
 #pragma once
 
 #include "esphome.h"
-#include "esphome/components/atlas_serial_expander/atlas_serial_expander.h"
+#include "esphome/components/sensor/sensor.h"
+#include "esphome/components/uart/uart.h"
+#include "../atlas_serial_expander/atlas_serial_expander.h"
 
 namespace esphome {
 namespace turbidity_sensor {
