@@ -28,7 +28,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(TurbiditySensor),
         cv.Required(CONF_NAME): cv.string,
         cv.Required(CONF_UART_ID): cv.use_id(uart.UARTDevice),
-        cv.Required(CONF_EXPANDER_ID): cv.use_id(cg.global_ns.class_("AtlasSerialExpander")),
+        cv.Required(CONF_EXPANDER_ID): cv.use_id(turbidity_ns.class_("AtlasSerialExpander")),
         cv.Required(CONF_CHANNEL): cv.int_range(min=0, max=7),
         cv.Required(CONF_TYPE): cv.enum(TYPE_OPTIONS),  # Match lowercase YAML values
     }
