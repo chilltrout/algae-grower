@@ -15,7 +15,6 @@ enum class TurbiditySensorType {
 
 class TurbiditySensor : public esphome::uart::UARTDevice, public PollingComponent {
  public:
-  //void set_uart_parent(esphome::uart::UARTDevice *uart_parent) { this->uart_parent_ = uart_parent; }
   void set_expander_parent(esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent) { this->expander_parent_ = expander_parent; }
   void set_type(TurbiditySensorType type) { this->type_ = type; }
   void set_channel(uint8_t channel) { this->channel_ = channel; }
@@ -34,7 +33,6 @@ class TurbiditySensor : public esphome::uart::UARTDevice, public PollingComponen
   TurbiditySensorType type_ = TurbiditySensorType::TURBIDITY;
   sensor::Sensor *turbidity_sensor_{nullptr};
   sensor::Sensor *adc_sensor_{nullptr};
-  esphome::uart::UARTDevice *uart_parent_{nullptr};
   esphome::atlas_serial_expander::AtlasSerialExpander* expander_parent_{nullptr};
   uint8_t channel_{0};
 };
