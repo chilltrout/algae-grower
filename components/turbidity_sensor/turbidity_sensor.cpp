@@ -33,8 +33,14 @@ void TurbiditySensor::request_data_() {
 
   const uint8_t *command = (this->type_ == TurbiditySensorType::TURBIDITY) ? dirty_command : adc_command;
   
-  for (size_t i = 0; i < sizeof(dirty_command); ++i) {
-    this->uart_parent_->write(command[i]);
+  if (this->uart_parent_ != nullptr){
+      for (size_t i = 0; i < 8; ++i) {
+        this->uart_parent_->write(command[i]);
+      }
+       while (this->uart_parent_->available()) {
+        uint8_t byte = this->uart_parent_->read();
+        rx_buffer_.push_back(byte);
+        }
   }
 }
 
