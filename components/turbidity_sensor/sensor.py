@@ -11,6 +11,7 @@ TurbiditySensor = turbidity_ns.class_("TurbiditySensor", cg.PollingComponent, se
 CONF_TYPE = "type"
 CONF_CHANNEL = "channel"
 CONF_EXPANDER_ID = "expander_id"
+CONF_UART_ID = "uart_id"
 
 TURBIDITY_SENSOR_TYPE = cv.enum({
     "turbidity": 0,
@@ -21,16 +22,19 @@ CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(TurbiditySensor),
         cv.Required(CONF_NAME): cv.string,
-        cv.Required("uart_id"): cv.use_id(uart.UARTComponent),
-        cv.Required(CONF_TYPE): TURBIDITY_SENSOR_TYPE,
+        cv.Required(CONF_UART_ID): cv.use_id(uart.UARTComponent),
+        cv.Required(CONF_TYPE): cv.enum({"turbidity": 0, "adc": 1}),
         cv.Required(CONF_CHANNEL): cv.int_,
         cv.Optional(CONF_EXPANDER_ID): cv.use_id(cg.Component),
     }
 ).extend(cv.polling_component_schema("60s"))
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID], await cg.get_variable(config["uart_id"]))
+    var = cg.new_Pvariable(config[CONF_ID], TurbiditySensor)
     await cg.register_component(var, config)
+
+    uart_component = await cg.get_variable(config[CONF_UART_ID])
+    cg.add(var.set_uart_parent(uart_component))
 
     if CONF_EXPANDER_ID in config:
         expander_parent = await cg.get_variable(config[CONF_EXPANDER_ID])
