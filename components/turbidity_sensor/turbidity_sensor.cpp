@@ -19,7 +19,7 @@ void TurbiditySensor::update() {
   }
 
   float value;
-  if (this->parse_response_(this->rx_buffer_, value)) {
+  if (this->parse_response_(value)) {
     ESP_LOGD(TAG, "Parsed value: %.2f", value);
     this->publish_state(value);
   } else {
@@ -43,14 +43,14 @@ bool TurbiditySensor::wait_for_response_() {
   return this->uart_parent_->available() > 0;
 }
 
-bool TurbiditySensor::parse_response_(const std::vector<uint8_t> &response, float &value) {
-  if (response.size() < 7) {
+bool TurbiditySensor::parse_response_(float &value) {
+  if (rx_buffer_.size() < 7) {
     ESP_LOGW(TAG, "Invalid response length");
     return false;
   }
 
-  uint16_t high_byte = response[3];
-  uint16_t low_byte = response[4];
+  uint16_t high_byte = rx_buffer_[3];
+  uint16_t low_byte = rx_buffer_[4];
   
   value = static_cast<float>((high_byte << 8) | low_byte);
   
