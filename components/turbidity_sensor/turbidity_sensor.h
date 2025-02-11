@@ -13,8 +13,9 @@ enum class TurbiditySensorType {
   ADC,
 };
 
-class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
+class TurbiditySensor : public PollingComponent, public sensor::Sensor {
  public:
+  TurbiditySensor() {}
   void set_uart_parent(uart::UARTComponent *uart_parent) { this->uart_parent_ = uart_parent; }
   void set_expander_parent(esphome::atlas_serial_expander::AtlasSerialExpander *expander_parent) { this->expander_parent_ = expander_parent; }
   void set_channel(uint8_t channel) { this->channel_ = channel; }
@@ -27,7 +28,6 @@ class TurbiditySensor : public PollingComponent,  public sensor::Sensor {
   void request_data_();
   bool wait_for_response_();
   bool parse_response_(float &value);
-  
 
  private:
   uart::UARTComponent *uart_parent_{nullptr};
